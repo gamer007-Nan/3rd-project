@@ -1,0 +1,6 @@
+Flask>=3.0
+PyMySQL>=1.1
+cryptography>=42.0
+# Computer-vision pipeline (only needed to run detector.py):
+opencv-python>=4.9
+ultralytics>=8.2

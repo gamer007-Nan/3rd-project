@@ -1,0 +1,8 @@
+{
+  "_help": "Maps the object name the detector sees to a product id (or SKU) in the database. Edit to match your products. With a fine-tuned model, use your own class names.",
+  "bottle": 1,
+  "cup": 2,
+  "book": 3,
+  "cell phone": 4,
+  "cake": 5
+}

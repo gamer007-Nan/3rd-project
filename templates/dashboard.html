@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Retail Guard dashboard</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-role="{{ role }}">
+<header class="top">
+  <strong class="brand">Retail Guard</strong>
+  <nav id="tabs">
+    <button data-view="overview" class="active">Overview</button>
+    <button data-view="products">Products</button>
+    <button data-view="sales">Sales</button>
+    <button data-view="alerts">Alerts <span id="alert-badge" class="badge" hidden>0</span></button>
+    <button data-view="camera">Camera test</button>
+    {% if role == 'admin' %}<button data-view="reports">Reports</button>{% endif %}
+  </nav>
+  <span class="who">{{ username }} ({{ role }}) <button id="logout" class="btn btn-ghost">Sign out</button></span>
+</header>
+
+<main>
+  <section id="view-overview" class="view">
+    <h2>Overview</h2>
+    <div id="stats" class="stats"></div>
+    <p class="muted">A camera exit is only a candidate. It becomes a theft alert when no sale for that product is found within ±90 seconds.</p>
+    <h3>Recent open alerts</h3>
+    <div id="overview-alerts"></div>
+  </section>
+
+  <section id="view-products" class="view" hidden>
+    <div class="row"><h2>Products</h2>
+      <input id="search" placeholder="Search name, SKU or category">
+      {% if role == 'admin' %}<button id="add-product" class="btn">Add product</button>{% endif %}
+    </div>
+    <div class="scroll"><table id="products-table"></table></div>
+  </section>
+
+  <section id="view-sales" class="view" hidden>
+    <h2>Log a sale</h2>
+    <form id="sale-form" class="inline-form">
+      <label>Product<select name="product_id" class="product-select" required></select></label>
+      <label>Quantity<input name="quantity" type="number" min="1" value="1" required></label>
+      <label>Captured by<select name="source"><option value="qr_scan">QR scan-out</option><option value="pos_manual">Manual POS entry</option></select></label>
+      <label>Till<input name="till_id" maxlength="20" placeholder="T1"></label>
+      <button class="btn" type="submit">Record sale</button>
+    </form>
+    <p id="sale-msg" role="status"></p>
+    <h3>Latest sales</h3>
+    <div class="scroll"><table id="sales-table"></table></div>
+  </section>
+
+  <section id="view-alerts" class="view" hidden>
+    <div class="row"><h2>Alerts</h2>
+      <select id="alert-filter">
+        <option value="unresolved">Unresolved</option><option value="">All</option>
+        <option value="resolved">Resolved</option><option value="false_alarm">False alarms</option>
+      </select></div>
+    <div class="scroll"><table id="alerts-table"></table></div>
+  </section>
+
+  <section id="view-camera" class="view" hidden>
+    <h2>Camera test</h2>
+    <p class="muted">No camera? Pretend one just saw a product leave the shelf zone. Log a sale for that product first and the event is closed as legitimate. Skip the sale and it becomes an alert.</p>
+    <form id="camera-form" class="inline-form">
+      <label>Product<select name="product_id" class="product-select" required></select></label>
+      <button class="btn" type="submit">Simulate shelf exit</button>
+    </form>
+    <p id="camera-msg" role="status"></p>
+  </section>
+
+  {% if role == 'admin' %}
+  <section id="view-reports" class="view" hidden>
+    <h2>Audit log</h2>
+    <form id="report-form" class="inline-form">
+      <label>From<input type="date" name="from"></label>
+      <label>To<input type="date" name="to"></label>
+      <button class="btn" type="submit">Download CSV</button>
+    </form>
+  </section>
+  {% endif %}
+</main>
+
+<dialog id="product-dialog">
+  <form method="dialog" id="product-form">
+    <h3 id="dialog-title">Product</h3>
+    <label>Name<input name="name" maxlength="100" required></label>
+    <label>SKU<input name="sku" maxlength="20" required></label>
+    <label>Category<input name="category" maxlength="50" required></label>
+    <label>Price<input name="price" type="number" step="0.01" min="0" required></label>
+    <label>Stock level<input name="stock_level" type="number" min="0" required></label>
+    <label>Reorder point<input name="reorder_point" type="number" min="0" required></label>
+    <p id="dialog-msg" class="error" role="alert"></p>
+    <div class="row"><button class="btn" type="submit" value="save">Save</button>
+      <button class="btn btn-ghost" type="button" id="dialog-cancel">Cancel</button></div>
+  </form>
+</dialog>
+
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
